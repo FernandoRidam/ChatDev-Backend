@@ -24,12 +24,17 @@ module.exports = {
 
     const user = await UserService.createUser( data );
 
-    return res.json({ success: true, message: 'Usuário cadastrado com sucesso!', user });
+    await UserService.sendEmail( user );
+
+    return res.json({ success: true, message: 'Usuário cadastrado com sucesso!', user_id: user._id });
   },
 
   async savePass( req, res ) {
     const {
-      user_id,
+      _id: user_id,
+    } = req.params;
+
+    const {
       code,
       password,
       confirmPassword,
