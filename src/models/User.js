@@ -8,6 +8,7 @@ const UserSchema = new Schema({
 
   code: { // Gerar após trazer informações do GitHub
     type: String,
+    select: false,
   },
 
   password: {
