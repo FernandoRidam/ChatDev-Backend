@@ -57,4 +57,19 @@ module.exports = {
 
     return res.json({ success: true, message: 'Senha salva com sucesso!'});
   },
+
+  async login( req, res ) {
+    const {
+      username,
+      password,
+    } = req.body;
+
+    const response = await UserService.login({ username, password });
+
+    if( response.success ) {
+      return res.json({ success: true, message: 'Login efetuado com sucesso!', token: response.token });
+    } else {
+      return res.json( response );
+    }
+  },
 };

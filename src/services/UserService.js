@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');
 
+const auth = require('../config/auth');
+
 const {
   codeGenerator,
 } = require('../utils/hashGanerator');
@@ -70,8 +72,26 @@ module.exports = {
   },
 
   async verifyCode( user_id, code ) {
-    const user = await User.findById( user_id );
+    const user = await User.findById( user_id ).select('+code');
 
     return user.code === code;
+  },
+
+  async login( user ) {
+    const userResponse = await User.findOne({ username: user.username }).select('+password');
+
+    if( !userResponse )
+      return { success: false, message: 'Usuário não encontrado!' };
+
+    const checkPass = await bcrypt.compare( user.password, userResponse.password );
+
+    if( !checkPass )
+      return { success: false, message: 'Senha Inválida!' };
+
+      userResponse.password = undefined;
+
+    const token = await auth.generateToken( userResponse._id );
+
+    return { success: true, token };
   },
 };
