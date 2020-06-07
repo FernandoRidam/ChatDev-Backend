@@ -15,32 +15,37 @@ const {
 
 module.exports = {
   async createUser( newUser ) {
+    const checkUsername = await User.findOne({ username: newUser.username });
+
+    if( checkUsername )
+      return { success: false, message: 'Usuário já cadastrado!'};
+
+    const checkEmail = await User.findOne({ email: newUser.email });
+
+    if( checkEmail )
+      return { success: false, message: 'Email já cadastrado!'};
+
     // Coletar dados do GitHub, gerar código...
-    const response = await axios.get(`https://api.github.com/users/${ newUser.username }`);
+    try {
+      const response = await axios.get(`https://api.github.com/users/${ newUser.username }`);
 
-    const {
-      name,
-      bio,
-      avatar_url,
-    } = response.data;
+      const {
+        name,
+        bio,
+        avatar_url,
+      } = response.data;
 
-    newUser.name = name;
-    newUser.bio = bio;
-    newUser.image = avatar_url;
-    newUser.code = codeGenerator(6);
+      newUser.name = name;
+      newUser.bio = bio;
+      newUser.image = avatar_url;
+      newUser.code = codeGenerator(6);
+    } catch( error ) {
+      // Retornar resposta de acordo com status code do github
+      return { success: false, message: 'Usuário GitHub não encontrado!'};
+    };
 
     const user = await User.create( newUser );
 
-    return user;
-  },
-
-  async savePass( user_id, pass ) {
-    const password = await  bcrypt.hash( pass, 10);
-
-    await User.findByIdAndUpdate( user_id, { password, code: undefined });
-  },
-
-  async sendEmail( user ) {
     // Enviar código por email...
     transport.sendMail({
       from: 'ridam.chatdev@gmail.com',
@@ -48,33 +53,36 @@ module.exports = {
       subject: `Código De Verificação Do ChatDev`,
       text: `Olá Sr(a) ${ user.name }, Seja bem vindo(a) a comunidade ChatDev. Aqui está o seu códgio de verificação: ${ user.code }`,
     }, ( error, info ) => {
-      if( error )
+      if( error ) {
         console.log( error );
+
+        return { success: false, message: 'Problemas ao enviar email'};
+      }
     });
+
+    return { success: true, message: 'Usuário cadastrado com sucesso!', user_id: user._id };
   },
 
-  async getUser( user_id ) {
-    const user = await User.findById( user_id );
+  async verifyCode( user_id, verify) {
+    if( verify.password !== verify.confirmPassword )
+      return { success: false, message: 'Senhas não coincidem!'};
 
-    return user;
-  },
-
-  async checkUsername( username ) {
-    const user = await User.findOne({ username });
-
-    return user;
-  },
-
-  async checkEmail( email ) {
-    const user = await User.findOne({ email });
-
-    return user;
-  },
-
-  async verifyCode( user_id, code ) {
     const user = await User.findById( user_id ).select('+code');
 
-    return user.code === code;
+    if( !user )
+      return { success: false, message: 'Usuário não encontrado!'};
+
+    if( user.code !== verify.code )
+      return { success: false, message: 'Código informado está incorreto!'};
+
+    const password = await  bcrypt.hash( verify.password, 10);
+
+    user.password = password;
+    user.code = undefined;
+
+    await user.save();
+
+    return { success: true, message: 'Senha salva com sucesso!'};
   },
 
   async login( user ) {
@@ -92,6 +100,6 @@ module.exports = {
 
     const token = await auth.generateToken( userResponse._id );
 
-    return { success: true, token };
+    return { success: true, message: 'Login efetuado com sucesso!', token };
   },
 };

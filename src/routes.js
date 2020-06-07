@@ -1,12 +1,26 @@
 const { Router } = require('express');
 
+const auth = require('./config/auth');
+
 const UserController = require('./controllers/UserController');
+const GroupController = require('./controllers/GroupController');
 
 const routes = Router();
 
 // Users...
-routes.post('/users', UserController.create );
-routes.post('/users/verify_code/:_id', UserController.savePass );
-routes.post('/users/login', UserController.login )
+routes.post('/users', UserController.store );
+routes.post('/users/verify_code/:_id', UserController.verifyCode );
+routes.post('/users/login', UserController.login );
+
+// Goups...
+routes.post('/groups', auth.authenticate, GroupController.store );
+routes.get('/groups', auth.authenticate, GroupController.index );
+routes.get('/groups/:_id', auth.authenticate, GroupController.show );
+routes.put('/groups/:_id', auth.authenticate, GroupController.update );
+routes.delete('/groups/:_id', auth.authenticate, GroupController.delete );
+routes.get('/groups/join/:_id', auth.authenticate, GroupController.join );
+routes.get('/groups/exit/:_id', auth.authenticate, GroupController.exit );
+
+// Messages...
 
 module.exports = routes;
