@@ -25,11 +25,11 @@ module.exports = {
     if( !/^Bearer$/i.test( scheme ))
       return res.json({ success: false, message: 'Formato do token é inválido!'});
 
-    jwt.verify( token, authConfig.auth_key, ( error, decoded ) => {
+    jwt.verify( token, authConfig, ( error, decoded ) => {
       if( error )
         return res.json({ success: false, message: 'Token inválido!' });
 
-      req.user = decoded.user;
+      req.user_id = decoded.user_id;
 
       return next();
     });
