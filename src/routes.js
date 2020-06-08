@@ -4,6 +4,7 @@ const auth = require('./config/auth');
 
 const UserController = require('./controllers/UserController');
 const GroupController = require('./controllers/GroupController');
+const MessageController = require('./controllers/MessageController');
 
 const routes = Router();
 
@@ -22,5 +23,7 @@ routes.get('/groups/join/:_id', auth.authenticate, GroupController.join );
 routes.get('/groups/exit/:_id', auth.authenticate, GroupController.exit );
 
 // Messages...
+routes.post('/messages/:_id', auth.authenticate, MessageController.store );
+routes.get('/messages/:_id', auth.authenticate, MessageController.index );
 
 module.exports = routes;
