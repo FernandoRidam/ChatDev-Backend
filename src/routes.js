@@ -10,7 +10,7 @@ const routes = Router();
 
 // Users...
 routes.post('/users', UserController.store );
-routes.post('/users/verify_code/:_id', UserController.verifyCode );
+routes.post('/users/code/:_id', UserController.verifyCode );
 routes.post('/users/login', UserController.login );
 
 // Goups...
