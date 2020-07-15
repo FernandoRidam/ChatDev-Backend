@@ -91,6 +91,9 @@ module.exports = {
     if( !userResponse )
       return { success: false, message: 'Usuário não encontrado!' };
 
+    if( !userResponse.password )
+      return { success: false, message: 'Cadastro não finalizado!' };
+
     const checkPass = await bcrypt.compare( user.password, userResponse.password );
 
     if( !checkPass )

@@ -21,7 +21,15 @@ module.exports = {
   async listGroup() {
     const groups = await Group.find().select('-members');
 
-    return groups;
+    // const interactingGroups = groups.filter( group => {
+    //   return group.members.some(( element, index, array ) => {
+    //     const id = element.toString();
+
+    //     return id === user_id;
+    //   });
+    // });
+
+    return { success: true, message: 'Grupos listados com sucesso!', groups };
   },
 
   async showGroup( group_id ) {

@@ -5,7 +5,7 @@ const authConfig = process.env.AUTH_KEY //Ridam@ChatDev
 module.exports = {
   async generateToken( user_id ) {
     return jwt.sign({ user_id }, authConfig, {
-      expiresIn: '3d',
+      expiresIn: '5h',
     });
   },
 
@@ -26,8 +26,12 @@ module.exports = {
       return res.json({ success: false, message: 'Formato do token é inválido!'});
 
     jwt.verify( token, authConfig, ( error, decoded ) => {
-      if( error )
+      if( error ) {
+        if( error.name === 'TokenExpiredError')
+          return res.json({ success: false, message: 'Token expirado!' });
+
         return res.json({ success: false, message: 'Token inválido!' });
+      }
 
       req.user_id = decoded.user_id;
 
