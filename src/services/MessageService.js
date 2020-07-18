@@ -53,13 +53,13 @@ module.exports = {
       return { success: false, message: 'Você não é membro deste grupo!'};
 
     const messages = await Message
-      .find()
+      .find().sort({ createdAt: -1 })
       .populate({
         path: 'user_id',
         select: 'name',
       })
-      .where({ group_id })
+      .where({ group_id });
 
-      return messages;
+      return { success: true, message: 'Listagem de mensagens com sucesso!', messages };
   },
 };

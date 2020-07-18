@@ -38,4 +38,16 @@ module.exports = {
 
     return res.json( response );
   },
+
+  async getProfile( req, res ) {
+    const user_id = req.user_id;
+
+    const {
+      _id: profile_id,
+    } = req.params;
+
+    const response = await UserService.getProfile( user_id, profile_id );
+
+    return res.json( response );
+  },
 };

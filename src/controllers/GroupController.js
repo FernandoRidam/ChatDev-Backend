@@ -15,7 +15,9 @@ module.exports = {
   },
 
   async index( req, res ) {
-    const groups = await GroupService.listGroup();
+    const user_id = req.user_id;
+
+    const groups = await GroupService.listGroup( user_id );
 
     return res.json( groups );
   },
@@ -54,7 +56,7 @@ module.exports = {
       _id: group_id,
     } = req.params;
 
-    const response = await GroupService.updateGroup( user_id, group_id );
+    const response = await GroupService.deleteGroup( user_id, group_id );
 
     return res.json( response );
   },

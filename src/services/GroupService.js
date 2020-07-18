@@ -18,18 +18,42 @@ module.exports = {
     return { success: true, message: 'Grupo criado com sucesso!', group };
   },
 
-  async listGroup() {
-    const groups = await Group.find().select('-members');
+  async listGroup( user_id ) {
+    const groups = await Group.find()//.select('-members');
 
-    // const interactingGroups = groups.filter( group => {
-    //   return group.members.some(( element, index, array ) => {
-    //     const id = element.toString();
+    const interactingGroups = groups.filter( group => {
+      const isMember = group.members.some(( element, index, array ) => {
+        const id = element.toString();
 
-    //     return id === user_id;
-    //   });
-    // });
+        return id === user_id;
+      });
 
-    return { success: true, message: 'Grupos listados com sucesso!', groups };
+      return isMember ? group : null;
+    });
+
+    const groupsNotInteracting = groups.filter( group => {
+      const isMember = group.members.some(( element, index, array ) => {
+        const id = element.toString();
+
+        return id === user_id;
+      });
+
+      return !isMember ? group : null;
+    });
+
+    groupsNotInteracting.map( group => {
+      group.members = undefined;
+
+      return group;
+    });
+
+    interactingGroups.map( group => {
+      group.members = undefined;
+
+      return group;
+    });
+
+    return { success: true, message: 'Grupos listados com sucesso!', groupsNotInteracting, interactingGroups };
   },
 
   async showGroup( group_id ) {

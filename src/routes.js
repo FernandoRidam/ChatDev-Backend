@@ -13,6 +13,8 @@ routes.post('/users', UserController.store );
 routes.post('/users/code/:_id', UserController.verifyCode );
 routes.post('/users/login', UserController.login );
 
+routes.get('/users/:_id', auth.authenticate, UserController.getProfile );
+
 // Goups...
 routes.post('/groups', auth.authenticate, GroupController.store );
 routes.get('/groups', auth.authenticate, GroupController.index );

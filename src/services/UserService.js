@@ -27,16 +27,16 @@ module.exports = {
 
     // Coletar dados do GitHub, gerar código...
     try {
-      const response = await axios.get(`https://api.github.com/users/${ newUser.username }`);
+      const { data } = await axios.get(`https://api.github.com/users/${ newUser.username }`);
 
       const {
         name,
         bio,
         avatar_url,
-      } = response.data;
+      } = data;
 
-      newUser.name = name;
-      newUser.bio = bio;
+      newUser.name = name || newUser.username;
+      newUser.bio = bio || newUser.username;
       newUser.image = avatar_url;
       newUser.code = codeGenerator(6);
     } catch( error ) {
@@ -103,6 +103,20 @@ module.exports = {
 
     const token = await auth.generateToken( userResponse._id );
 
-    return { success: true, message: 'Login efetuado com sucesso!', token };
+    return { success: true, message: 'Login efetuado com sucesso!', token, user_id: userResponse._id };
+  },
+
+  async getProfile( user_id, profile_id ) {
+    const user = await User.findById( user_id );
+
+    if( !user )
+      return { success: false, message: 'Usuário não encontrado!'};
+
+    const profile = await User.findById( profile_id );
+
+    if( !profile )
+      return { success: false, message: 'Usuário não encontrado!'};
+
+    return { success: true, message: 'Usuário encontrado com sucesso!', profile };
   },
 };
