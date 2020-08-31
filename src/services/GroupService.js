@@ -15,11 +15,13 @@ module.exports = {
       members: [ user_id ],
     });
 
-    return { success: true, message: 'Grupo criado com sucesso!', group };
+    group.members = undefined;
+
+    return { success: true, message: 'Grupo criado com sucesso!' };
   },
 
   async listGroup( user_id ) {
-    const groups = await Group.find()//.select('-members');
+    const groups = await Group.find();
 
     const interactingGroups = groups.filter( group => {
       const isMember = group.members.some(( element, index, array ) => {
@@ -134,7 +136,7 @@ module.exports = {
 
     await group.save();
 
-    return { success: true, message: `Pronto! Você agora faz parte do grupo ${ group.name }`};
+    return { success: true, message: `Você agora faz parte do grupo ${ group.name }!`};
   },
 
   async exitGroup( user_id, group_id ) {
@@ -161,6 +163,20 @@ module.exports = {
 
     await group.save();
 
-    return { success: true, message: `Pronto! Você deixou o grupo ${ group.name }`};
+    return { success: true, message: `Você deixou o grupo ${ group.name }!`};
+  },
+
+  async sendMessageSocket( io, group_id, onlineUsers, message ) {
+    const group = await Group.findById( group_id );
+
+    group.members.map( member => {
+      const memberSocket = onlineUsers[ member.toString()];
+
+      if( memberSocket ) {
+        io.to( memberSocket ).emit('message', message );
+      }
+    });
+
+    return { success: true, message: 'Sucesso!'};
   },
 }

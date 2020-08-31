@@ -6,9 +6,9 @@ require('dotenv').config();
 
 const routes = require('./routes');
 
-
 const app = express();
 const server = require('http').Server( app );
+const io = require('socket.io')( server );
 
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
@@ -19,6 +19,21 @@ mongoose.connect(`mongodb+srv://ridam:${ process.env.BD_PASSWORD }@cluster0-69kd
   useNewUrlParser: true,
 });
 
+const onlineUsers = [];
+
+io.on('connection', socket => {
+  const { user } = socket.handshake.query;
+
+  onlineUsers[ user ] = ( socket.id );
+});
+
+app.use(( req, res, next ) => {
+  req.io = io;
+  req.onlineUsers = onlineUsers;
+
+  return next();
+});
+
 app.use( cors());
 app.use( express.json());
 app.use( routes );
@@ -26,3 +41,4 @@ app.use( routes );
 const port = process.env.PORT;
 
 server.listen( port );
+console.log(`Server Runing In Port ${ port }`);
