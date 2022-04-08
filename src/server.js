@@ -15,7 +15,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect(`mongodb+srv://ridam:${ process.env.BD_PASSWORD }@cluster0-69kdy.mongodb.net/${ process.env.BD_NAME }?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb+srv://ridam:${ process.env.BD_PASSWORD }@cluster0.gtsrp.mongodb.net/${ process.env.BD_NAME }?retryWrites=true&w=majority`, {
   useNewUrlParser: true,
 });
 
@@ -41,4 +41,4 @@ app.use( routes );
 const port = process.env.PORT;
 
 server.listen( port );
-console.log(`Server Runing In Port ${ port }`);
+console.log(`Server Running In Port ${ port }`);
