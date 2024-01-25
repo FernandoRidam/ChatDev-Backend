@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const authConfig = process.env.AUTH_KEY //Ridam@ChatDev
+const authConfig = process.env.AUTH_KEY
 
 module.exports = {
   async generateToken( user_id ) {
